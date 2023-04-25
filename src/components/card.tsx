@@ -8,6 +8,7 @@ interface Props {
 export default function CahCard({children,color}: Props) {
   const reverse = (color == "black") ? "white" : "black"
   function fontSize() {
+    if (!children) return "xl"
     var x = children.length;
     switch (true) {
         case (x < 20):
