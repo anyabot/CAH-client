@@ -78,7 +78,6 @@ export default function Home() {
     if (router.query.id) {
       checkRoom();
       socket!.on("room_data", (msg: { players: { [key: string]: Player } }) => {
-        console.log(msg);
         setPlayers(msg.players);
       });
       socket!.on(
@@ -91,7 +90,6 @@ export default function Home() {
             pick: number;
           };
         }) => {
-          console.log(msg);
           setPlayers(msg.players);
           setGoal(msg.blackCard);
           setJudge(msg.judge);
@@ -102,7 +100,6 @@ export default function Home() {
         }
       );
       socket!.on("game_judge", (msg: { players: { [key: string]: Player } }) => {
-        console.log("judge", msg.players)
         setStarted("judging");
         setPlayers(msg.players);
       });
@@ -119,7 +116,6 @@ export default function Home() {
   function handleClick(index: number) {
     if (picked.includes(index)) {
       let temp = picked.filter((e) => e != index);
-      console.log(temp);
       setPicked(temp);
     } else if (picked.length >= goal.pick) {
       toast({

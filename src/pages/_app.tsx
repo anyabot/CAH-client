@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 export default function App({ Component, pageProps }: AppProps) {
   const connectSocket = async () => {
     const socket = await socketService
-      .connect("http://localhost:9000")
+      .connect(process.env.NEXT_PUBLIC_SERVER as string)
       .catch((err) => {
         console.log("Error: ", err);
       });
