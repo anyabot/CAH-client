@@ -111,7 +111,7 @@ export default function Home() {
         setJudge("")
       });
     }
-  }, [router.query.id]);
+  }, [router.query.id, router, toast]);
 
   function handleClick(index: number) {
     if (picked.includes(index)) {
@@ -296,7 +296,7 @@ export default function Home() {
                   </Box>
                 ))}
               </Flex>
-            </> : <Text>You're the Judge, please wait for other players to finish</Text> 
+            </> : <Text>You are the Judge, please wait for other players to finish</Text> 
             }
             </Card>
           </>
