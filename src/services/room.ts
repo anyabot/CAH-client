@@ -34,11 +34,9 @@ class RoomService {
   }
 
   public async checkRoom(socket: Socket, roomId: string): Promise<{[key:string]: Player}> {
-    console.log("Checking", roomId)
     return new Promise((rs, rj) => {
       socket.emit("check_room", {roomId});
       socket.on("room_data", ({players}: {players: {[key:string]: Player}}) => {
-        console.log("check_room", players)
         rs(players)
       });
       socket.on("not_joined", ({ error }) => rj(error));
