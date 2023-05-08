@@ -16,6 +16,7 @@ import {
   useToast,
   Circle,
   TagRightIcon,
+  CardFooter,
 } from "@chakra-ui/react";
 import { ArrowBackIcon, CheckIcon } from "@chakra-ui/icons";
 import Link from "next/link";
@@ -207,6 +208,7 @@ export default function Home() {
               </Tag>
             ))}
           </CardBody>
+          {started == "waiting" ? (<CardFooter><Text m={2}>{"The game will start when all players (min 3) are ready."}</Text></CardFooter>) : null}
         </Card>
         <Divider my={8} />
         {started == "waiting" ? (
@@ -296,7 +298,7 @@ export default function Home() {
                   </Box>
                 ))}
               </Flex>
-            </> : <Text>You are the Judge, please wait for other players to finish</Text> 
+            </> : <Text m={2}>You are the Judge, please wait for other players to finish</Text> 
             }
             </Card>
           </>
