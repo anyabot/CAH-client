@@ -17,6 +17,19 @@ import {
   Circle,
   TagRightIcon,
   CardFooter,
+  FormControl, 
+  VStack,
+  FormLabel, 
+  Input,
+  FormErrorMessage,
+  Modal, 
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  useDisclosure
 } from "@chakra-ui/react";
 import { ArrowBackIcon, CheckIcon } from "@chakra-ui/icons";
 import Link from "next/link";
@@ -27,11 +40,14 @@ import cah from "../../../public/cah-all-compact.json";
 import arrayShuffle from "array-shuffle";
 
 export default function Home() {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [started, setStarted] = useState("waiting");
   const [hand, setHand] = useState<string[]>([]);
   const [goal, setGoal] = useState({ text: "", pick: 0 });
   const [picked, setPicked] = useState<number[]>([]);
   const [results, setResults] = useState<string[]>([]);
+  const [name, setName] = useState('')
+  const [refresh, setRefresh] = useState(false)
   const [error, setError] = useState(false);
   const [players, setPlayers] = useState<{ [key: string]: Player }>({});
   const [judge, setJudge] = useState("")
@@ -64,16 +80,24 @@ export default function Home() {
       const player_data = await roomService
         .checkRoom(socket!, router.query.id as string)
         .catch((err: string) => {
-          toast({
-            title: "Room Error.",
-            description: err,
-            status: "error",
-            duration: 9000,
-            isClosable: true,
-          });
-          router.push(`/`);
-          setError(true);
-          return;
+          if (err == "You have not joined this room") {
+            setStarted("not_joined")
+            onOpen()
+            setError(false)
+            return
+          }
+          else {
+            toast({
+              title: "Room Error.",
+              description: err,
+              status: "error",
+              duration: 9000,
+              isClosable: true,
+            });
+            router.push(`/`);
+            setError(true);
+            return;
+          }
         });
     }
     if (router.query.id) {
@@ -112,7 +136,7 @@ export default function Home() {
         setJudge("")
       });
     }
-  }, [router.query.id, router, toast]);
+  }, [router.query.id, router, toast, refresh]);
 
   function handleClick(index: number) {
     if (picked.includes(index)) {
@@ -160,7 +184,27 @@ export default function Home() {
       setPicked([])
     }
   }
+  async function join(name:string) {
+    const socket = socketService.socket;
+    if (socket) {
+      const roomId = await roomService
+      .joinRoom(socket, id, name)
+      .catch((err: string) => {
+        toast({
+          title: 'Joining Error.',
+          description: err,
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+      });
+      if (roomId) {
+        setRefresh(true)
+        setStarted("waiting")
+      }
+    }
 
+  }
 
   async function ready() {
     const socket = socketService.socket;
@@ -174,7 +218,30 @@ export default function Home() {
 
   if (!id) return <h1>Loading</h1>;
   else {
-    return error ? null : (
+    return error ? null : ((started == "not_joined") ? (
+      <>
+      <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Nickname to be used</ModalHeader>
+          <ModalBody>
+          <FormControl as={VStack} isInvalid={((name && (name.length < 2 || name.length > 10))) ? true : false}>
+      <FormLabel></FormLabel>
+      <Input type='text' placeholder="NickName" value={name} onChange={(event) => setName(event.target.value)}/>
+      {(name && (name.length < 2 || name.length > 10)) ? <FormErrorMessage>Nickname must be between 2 and 10 characters.</FormErrorMessage> : null}
+
+      </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={async () => {await join(name)}}>
+              Join
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+
+    ) : (
       <>
         <Button
           as={Link}
@@ -377,6 +444,6 @@ export default function Home() {
         </>
         ) : null}
       </>
-    );
+    ))
   }
 }
