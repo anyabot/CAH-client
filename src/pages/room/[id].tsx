@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Head from "next/head"
 import { useRouter } from "next/router";
 import Error from "next/error";
 import CahCard from "@/components/card";
@@ -216,10 +217,20 @@ export default function Home() {
     socket?.emit("leave", { roomId: id });
   }
 
-  if (!id) return <h1>Loading</h1>;
+  if (!id) return (
+    <>
+      <Head>
+        <title>Loading</title>
+      </Head>
+      <h1>Loading</h1>
+    </>
+  );
   else {
     return error ? null : ((started == "not_joined") ? (
       <>
+      <Head>
+        <title>{"Joining Room: " + id}</title>
+      </Head>
       <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
         <ModalOverlay />
         <ModalContent>
@@ -243,6 +254,9 @@ export default function Home() {
 
     ) : (
       <>
+        <Head>
+          <title>{"Room: " + id}</title>
+        </Head>
         <Button
           as={Link}
           href={`/`}
